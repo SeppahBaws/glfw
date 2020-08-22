@@ -870,10 +870,17 @@ static void handleEvents(int timeout)
             if (read_ret != 8)
                 return;
 
-            for (i = 0; i < repeats; ++i)
-                _glfwInputKey(_glfw.wl.keyboardFocus, _glfw.wl.keyboardLastKey,
-                              _glfw.wl.keyboardLastScancode, GLFW_REPEAT,
-                              _glfw.wl.xkb.modifiers);
+            if (_glfw.wl.keyboardFocus)
+            {
+                for (i = 0; i < repeats; ++i)
+                {
+                    _glfwInputKey(_glfw.wl.keyboardFocus,
+                                  _glfw.wl.keyboardLastKey,
+                                  _glfw.wl.keyboardLastScancode,
+                                  GLFW_REPEAT,
+                                  _glfw.wl.xkb.modifiers);
+                }
+            }
         }
 
         if (fds[2].revents & POLLIN)
@@ -1111,8 +1118,10 @@ void _glfwPlatformGetFramebufferSize(_GLFWwindow* window,
                                      int* width, int* height)
 {
     _glfwPlatformGetWindowSize(window, width, height);
-    *width *= window->wl.scale;
-    *height *= window->wl.scale;
+    if (width)
+        *width *= window->wl.scale;
+    if (height)
+        *height *= window->wl.scale;
 }
 
 void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
